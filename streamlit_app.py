@@ -5,152 +5,140 @@ import base64
 from user_agent import generate_user_agent
 from time import sleep
 
-# --- وظيفة معالجة الصورة البرمجية ---
+# --- معالجة الصورة ---
 def get_base64_image(image_path):
     try:
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     except: return None
 
-# --- إعدادات الصفحة ---
-st.set_page_config(page_title="Doser || TikTok", page_icon="⚔️", layout="centered")
+st.set_page_config(page_title="Doser || Abdelrahman", layout="centered")
 
 img_base = get_base64_image("icon.png")
 
-# --- CSS: هندسة تصميم iOS 26 (Glassmorphism & Soft Gradients) ---
+# --- CSS: تصميم iOS 26 الاحترافي ---
 st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&family=Cairo:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
     
-    /* خلفية iOS 26 الديناميكية */
     .stApp {{
-        background: linear-gradient(135deg, #1e2a4a 0%, #0f172a 50%, #1e1b4b 100%);
-        background-attachment: fixed;
-        font-family: 'SF Pro Display', 'Cairo', sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        font-family: 'Cairo', sans-serif;
     }}
 
-    /* الحاوية الزجاجية الرئيسية */
-    .ios-glass-card {{
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(25px) saturate(180%);
-        -webkit-backdrop-filter: blur(25px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 40px;
-        padding: 40px 20px;
-        text-align: center;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        margin-top: 20px;
-    }}
-
-    /* تنسيق الصورة الشخصية - حجم كبير وتوسط مطلق */
-    .profile-container {{
+    /* تنسيق الصورة - في المنتصف تماماً فوق الكونتينة */
+    .img-container {{
         display: flex;
         justify-content: center;
-        margin-bottom: 25px;
+        width: 100%;
+        margin-bottom: -50px; /* تداخل بسيط ليعطي شكل هندسي */
+        position: relative;
+        z-index: 10;
     }}
     .hero-img {{
-        width: 200px;
-        height: 200px;
-        border-radius: 35%; /* شكل iOS Squircle */
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        width: 220px;
+        height: 220px;
+        border-radius: 50px; /* iOS Squircle */
+        border: 5px solid rgba(255, 255, 255, 0.1);
         object-fit: cover;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }}
 
-    /* نصوص iOS */
-    .main-title {{
-        font-size: 2.8rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 5px;
-        letter-spacing: -1px;
-    }}
-    .ios-subtitle {{
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 1.1rem;
-        font-weight: 400;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 8px 20px;
-        border-radius: 50px;
-        display: inline-block;
-        margin-bottom: 30px;
+    /* الـ Container الزجاجي الكبير (تحت الصورة) */
+    .ios-card {{
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 40px;
+        padding: 70px 30px 40px 30px; /* حشوة علوية كبيرة بسبب تداخل الصورة */
+        text-align: center;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        width: 100%;
     }}
 
-    /* تحسين شكل المدخلات لتطابق نظام iOS */
+    /* لون الاسم الجديد */
+    .doser-name {{
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #00d4ff; /* لون سماوي احترافي متوهج */
+        margin-bottom: 5px;
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }}
+
+    /* الجملة داخل الكونتينة */
+    .smart-eng {{
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.9;
+        margin-bottom: 30px;
+    }}
+
+    /* تنسيق المدخلات */
     .stTextInput input, .stSelectbox [data-baseweb="select"] {{
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-radius: 15px !important;
+        background: rgba(0, 0, 0, 0.2) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: white !important;
-        height: 50px !important;
+        border-radius: 15px !important;
     }}
 
-    /* زر التشغيل - iOS Style */
+    /* الزر الرئيسي */
     .stButton>button {{
-        background: rgba(255, 255, 255, 0.95) !important;
+        background: #ffffff !important;
         color: #000 !important;
-        border-radius: 18px !important;
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
-        height: 55px !important;
+        font-weight: 700 !important;
+        border-radius: 20px !important;
+        height: 60px !important;
         width: 100% !important;
         border: none !important;
-        margin-top: 20px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transition: 0.3s ease;
     }}
     .stButton>button:hover {{
-        transform: scale(0.98);
-        background: #ffffff !important;
-        box-shadow: 0 0 20px rgba(255,255,255,0.2) !important;
+        transform: scale(0.97);
+        opacity: 0.9;
     }}
 
-    /* إخفاء الزوائد */
+    /* إخفاء الهيدر والفوتر الخاص بـ streamlit */
     #MainMenu, footer, header {{visibility: hidden;}}
     </style>
     """, unsafe_allow_html=True)
 
-# --- الهيكل البصري للهندسة الذكية ---
-st.markdown('<div class="ios-glass-card">', unsafe_allow_html=True)
+# --- الهيكل البصري ---
 
-# 1. الصورة في المنتصف
-if img_base:
-    st.markdown(f'<div class="profile-container"><img src="data:image/png;base64,{img_base}" class="hero-img"></div>', unsafe_allow_html=True)
-else:
-    st.markdown('<div class="profile-container"><div class="hero-img" style="background:gray;"></div></div>', unsafe_allow_html=True)
+# 1. الصورة في الأعلى حرة
+st.markdown(f"""
+    <div class="img-container">
+        <img src="data:image/png;base64,{img_base if img_base else ''}" class="hero-img">
+    </div>
+    """, unsafe_allow_html=True)
 
-# 2. العنوان
-st.markdown('<h1 class="main-title">Doser || Abdelrahman</h1>', unsafe_allow_html=True)
+# 2. الـ Container الزجاجي (تحت الصورة)
+st.markdown('<div class="ios-card">', unsafe_allow_html=True)
 
-# 3. الجملة المطلوبة داخل الـ Container الزجاجي بشكل أنيق
-st.markdown('<div class="ios-subtitle">الهندسة الذكية لخدمات الرشق المتطورة</div>', unsafe_allow_html=True)
+st.markdown('<div class="doser-name">Doser || Abdelrahman</div>', unsafe_allow_html=True)
+st.markdown('<div class="smart-eng">الهندسة الذكية لخدمات الرشق المتطورة</div>', unsafe_allow_html=True)
 
-# 4. الحقول (توسيط المحتوى الداخلي)
-col_input = st.columns([0.1, 0.8, 0.1])[1]
-with col_input:
-    service = st.selectbox("", ["إعجابات يوتيوب", "إعجابات تيك توك", "حفظ إنستغرام", "مشاهدات تيك توك"], label_visibility="collapsed")
+# عناصر التحكم
+col_in = st.columns([0.05, 0.9, 0.05])[1]
+with col_in:
+    option = st.selectbox("", ["إعجابات يوتيوب", "إعجابات تيك توك", "حفظ إنستغرام", "مشاهدات تيك توك"], label_visibility="collapsed")
+    v_url = st.text_input("", placeholder="ضع الرابط هنا...", label_visibility="collapsed")
     st.write("")
-    url_input = st.text_input("", placeholder="أدخل الرابط هنا...", label_visibility="collapsed")
-    
-    # 5. زر التنفيذ
-    execute_btn = st.button("تفعيل الخدمة الآن")
+    if st.button("🚀 بدأ التنفيذ"):
+        if v_url:
+            with st.spinner("جاري المعالجة..."):
+                sleep(2)
+                st.success("تمت العملية بنجاح!")
+                st.balloons()
+        else:
+            st.error("أدخل الرابط!")
 
-st.markdown('</div>', unsafe_allow_html=True) # نهاية الكارت الزجاجي
+st.markdown('</div>', unsafe_allow_html=True) # نهاية الـ ios-card
 
-# --- Logic (الباك إند) ---
-def process_request(url, link):
-    with st.spinner("جاري المعالجة بنظام  Doser..."):
-        sleep(2)
-        random_ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
-        # هنا تضع كود الـ requests الفعلي كما في النسخ السابقة
-        st.success(f"✅ تم الإرسال بنجاح | IP: {random_ip}")
-        st.balloons()
-
-if execute_btn:
-    if url_input:
-        process_request(service, url_input)
-    else:
-        st.error("يرجى إدخال الرابط أولاً")
-
-# --- Footer Meta ---
-st.markdown('<p style="text-align:center; color:rgba(255,255,255,0.3); font-size:0.8rem; margin-top:30px;">Architecture: iOS 26 Glass Engine | 2026</p>', unsafe_allow_html=True)
+# --- التذييل الجديد ---
+st.markdown("""
+    <div style="text-align: center; margin-top: 30px; color: rgba(255,255,255,0.4);">
+        تم التطوير بواسطه Doser || Abdelrahman
+    </div>
+    """, unsafe_allow_html=True)
