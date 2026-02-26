@@ -20,17 +20,19 @@ img_base = get_base64_image("icon.png")
 # --- CSS: هندسة تصميم iOS 26 (Glassmorphism & Soft Gradients) ---
 st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&family=Cairo:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&family=Cairo:wght@400;700&display=swap');
     
     /* خلفية iOS 26 الديناميكية */
     .stApp {{
-        background: linear-gradient(135deg, #1e2a4a 0%, #0f172a 50%, #1e1b4b 100%);
+        background: linear-gradient(135deg, #1a1f35 0%, #0b0f1a 50%, #1a1530 100%);
         background-attachment: fixed;
         font-family: 'SF Pro Display', 'Cairo', sans-serif;
     }}
 
     /* إخفاء كل عناصر Streamlit الافتراضية تماماً */
-    #MainMenu, footer, header, .stDeployButton, .stAppToolbar, .stActionButton, .st-emotion-cache-1dp5vir, .st-emotion-cache-15ecox0, .st-emotion-cache-1wbqy5l {{
+    #MainMenu, footer, header, .stDeployButton, .stAppToolbar, .stActionButton, 
+    .st-emotion-cache-1dp5vir, .st-emotion-cache-15ecox0, .st-emotion-cache-1wbqy5l,
+    .st-emotion-cache-1avcm0n, .st-emotion-cache-18ni7ap {{
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -40,11 +42,6 @@ st.markdown(f"""
         top: -9999px !important;
         left: -9999px !important;
         pointer-events: none !important;
-    }}
-    
-    /* منع ظهور أي عناصر إضافية */
-    .st-emotion-cache-1avcm0n, .st-emotion-cache-18ni7ap, .st-emotion-cache-1dp5vir, .st-emotion-cache-15ecox0 {{
-        display: none !important;
     }}
     
     /* إخفاء الشريط العلوي */
@@ -67,55 +64,64 @@ st.markdown(f"""
         width: 200px;
         height: 200px;
         border-radius: 35%;
-        border: 2px solid rgba(255, 215, 0, 0.3);
+        border: 3px solid rgba(255, 215, 0, 0.4);
         object-fit: cover;
-        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
     }}
 
-    /* العنوان الرئيسي - اللون الجديد (ذهبي) */
+    /* العنوان الرئيسي - ذهبي */
     .main-title {{
-        font-size: 2.8rem;
+        font-size: 3rem;
         font-weight: 700;
-        color: #FFD700; /* لون ذهبي */
+        color: #FFD700;
         margin-bottom: 5px;
         letter-spacing: -1px;
         text-align: center;
-        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     }}
     
     /* الحاوية الزجاجية للجملة */
     .glass-quote-container {{
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.07);
         backdrop-filter: blur(25px) saturate(180%);
         -webkit-backdrop-filter: blur(25px) saturate(180%);
-        border: 1px solid rgba(255, 215, 0, 0.2);
-        border-radius: 40px;
-        padding: 20px 25px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 50px;
+        padding: 25px 30px;
         text-align: center;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        margin: 25px auto 35px auto;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 215, 0, 0.1);
+        margin: 30px auto 40px auto;
         width: 90%;
-        max-width: 700px;
+        max-width: 750px;
     }}
     
-    /* تنسيق الجملة داخل الحاوية الزجاجية */
+    /* تنسيق الجملة داخل الحاوية الزجاجية - أبيض ناصع */
     .quote-text {{
-        color: rgba(255, 255, 255, 0.85);
-        font-size: 1.4rem;
-        font-weight: 400;
+        color: #FFFFFF;  /* أبيض ناصع */
+        font-size: 1.6rem;
+        font-weight: 600;  /* زيادة سمك الخط */
         margin: 0;
         line-height: 1.5;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);  /* ظل خفيف للوضوح */
+        letter-spacing: 0.5px;
     }}
 
     /* تحسين شكل المدخلات */
     .stTextInput input, .stSelectbox [data-baseweb="select"] {{
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-radius: 15px !important;
-        border: 1px solid rgba(255, 215, 0, 0.2) !important;
+        background: rgba(255, 255, 255, 0.07) !important;
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 215, 0, 0.3) !important;
         color: white !important;
-        height: 50px !important;
+        height: 55px !important;
         direction: rtl !important;
         text-align: right !important;
+        font-size: 1rem !important;
+        padding: 0 20px !important;
+    }}
+    
+    .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus {{
+        border-color: #FFD700 !important;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.3) !important;
     }}
     
     /* تنسيق الـ select box */
@@ -126,39 +132,66 @@ st.markdown(f"""
     
     /* تنسيق القائمة المنسدلة */
     .stSelectbox [data-baseweb="popover"] {{
-        background: rgba(15, 23, 42, 0.95) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 215, 0, 0.2) !important;
-        border-radius: 15px !important;
+        background: rgba(10, 15, 30, 0.95) !important;
+        backdrop-filter: blur(15px) !important;
+        border: 1px solid rgba(255, 215, 0, 0.3) !important;
+        border-radius: 20px !important;
     }}
     
     .stSelectbox [data-baseweb="popover"] li {{
         color: white !important;
         background: transparent !important;
+        font-size: 1rem !important;
+        padding: 12px 20px !important;
     }}
     
     .stSelectbox [data-baseweb="popover"] li:hover {{
         background: rgba(255, 215, 0, 0.2) !important;
+        color: #FFD700 !important;
     }}
 
-    /* زر التشغيل - ذهبي */
+    /* زر التشغيل - ذهبي متطور */
     .stButton>button {{
-        background: linear-gradient(135deg, #FFD700, #FDB931) !important;
+        background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700) !important;
+        background-size: 200% 200% !important;
         color: #000 !important;
-        border-radius: 18px !important;
+        border-radius: 25px !important;
         font-weight: 700 !important;
-        font-size: 1.1rem !important;
-        height: 55px !important;
+        font-size: 1.2rem !important;
+        height: 60px !important;
         width: 100% !important;
         border: none !important;
-        margin-top: 20px !important;
+        margin-top: 25px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+        text-shadow: 0 1px 3px rgba(255, 255, 255, 0.3) !important;
+        letter-spacing: 1px !important;
     }}
     .stButton>button:hover {{
-        transform: scale(0.98);
-        background: linear-gradient(135deg, #FDB931, #FFD700) !important;
-        box-shadow: 0 0 30px rgba(255, 215, 0, 0.4) !important;
+        transform: scale(0.97);
+        background: linear-gradient(135deg, #FFA500, #FFD700, #FFA500) !important;
+        background-size: 200% 200% !important;
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.6) !important;
+    }}
+    
+    /* تنسيق رسائل النجاح والخطأ */
+    .stAlert {{
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 215, 0, 0.3) !important;
+        border-radius: 20px !important;
+        color: white !important;
+        font-weight: 500 !important;
+        text-align: center !important;
+    }}
+    
+    .stSuccess {{
+        background: rgba(255, 215, 0, 0.15) !important;
+        border-color: #FFD700 !important;
+    }}
+    
+    /* تنسيق الـ spinner */
+    .stSpinner > div {{
+        border-color: #FFD700 transparent transparent transparent !important;
     }}
     
     /* إخفاء أي رسائل افتراضية */
@@ -169,12 +202,12 @@ st.markdown(f"""
     /* تنسيق الفوتر */
     .footer-text {{
         text-align: center;
-        color: rgba(255, 215, 0, 0.5);
-        font-size: 0.9rem;
-        margin-top: 40px;
-        font-weight: 400;
-        letter-spacing: 1px;
-        text-shadow: 0 0 5px rgba(255, 215, 0, 0.2);
+        color: rgba(255, 215, 0, 0.6);
+        font-size: 1rem;
+        margin-top: 50px;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -185,12 +218,12 @@ st.markdown(f"""
 if img_base:
     st.markdown(f'<div class="profile-container"><img src="data:image/png;base64,{img_base}" class="hero-img"></div>', unsafe_allow_html=True)
 else:
-    st.markdown('<div class="profile-container"><div class="hero-img" style="background:gray;"></div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="profile-container"><div class="hero-img" style="background:linear-gradient(135deg, #FFD700, #FFA500);"></div></div>', unsafe_allow_html=True)
 
-# 2. العنوان الرئيسي (باللون الذهبي)
+# 2. العنوان الرئيسي (ذهبي)
 st.markdown('<h1 class="main-title">Doser || Abdelrahman</h1>', unsafe_allow_html=True)
 
-# 3. الحاوية الزجاجية للجملة
+# 3. الحاوية الزجاجية للجملة (النص الآن أبيض ناصع)
 st.markdown("""
     <div class="glass-quote-container">
         <div class="quote-text">الهندسة الذكية لخدمات الرشق المتطورة</div>
@@ -200,16 +233,16 @@ st.markdown("""
 # 4. الحقول والزر
 col_input = st.columns([0.1, 0.8, 0.1])[1]
 with col_input:
-    service = st.selectbox("", ["إعجابات يوتيوب", "إعجابات تيك توك", "حفظ إنستغرام", "مشاهدات تيك توك"], label_visibility="collapsed")
+    service = st.selectbox("", ["✨ إعجابات يوتيوب", "✨ إعجابات تيك توك", "✨ حفظ إنستغرام", "✨ مشاهدات تيك توك"], label_visibility="collapsed")
     st.write("")
     url_input = st.text_input("", placeholder="أدخل الرابط هنا...", label_visibility="collapsed")
     
     # 5. زر التنفيذ
-    execute_btn = st.button("تفعيل الخدمة الآن")
+    execute_btn = st.button("⚡ تفعيل الخدمة الآن ⚡")
 
 # --- Logic (الباك إند) ---
 def process_request(url, link):
-    with st.spinner("جاري المعالجة بنظام Doser..."):
+    with st.spinner("⚙️ جاري المعالجة بنظام Doser..."):
         sleep(2)
         random_ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
         # هنا تضع كود الـ requests الفعلي
@@ -220,7 +253,7 @@ if execute_btn:
     if url_input:
         process_request(service, url_input)
     else:
-        st.error("يرجى إدخال الرابط أولاً")
+        st.error("❌ يرجى إدخال الرابط أولاً")
 
 # --- Footer ---
-st.markdown('<p class="footer-text">تم التطوير بواسطه Doser || Abdelrahman</p>', unsafe_allow_html=True)
+st.markdown('<p class="footer-text">تم التطوير بواسطة Doser || Abdelrahman ✦ 2026</p>', unsafe_allow_html=True)
