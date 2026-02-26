@@ -1,4 +1,3 @@
-
 import streamlit as st
 import requests
 import random
@@ -14,12 +13,12 @@ def get_base64_image(image_path):
     except: return None
 
 # --- إعدادات الصفحة ---
-st.set_page_config(page_title="Doser || TikTok", page_icon="⚔️", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Doser || Abdelrahman", page_icon="⚔️", layout="centered", initial_sidebar_state="collapsed")
 
 img_base = get_base64_image("icon.png")
 
 # --- CSS: تصميم iOS 26 Liquid Glass & Neumorphism ---
-st.markdown(f"""
+st.markdown(f'''
     <style>
     @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap');
     
@@ -232,15 +231,27 @@ st.markdown(f"""
     }}
     
     .stSuccess {{
-        background: rgba(52, 199, 89, 0.1) !important;
-        border-color: rgba(52, 199, 89, 0.3) !important;
+        background: rgba(52, 199, 89, 0.15) !important;
+        border-color: rgba(52, 199, 89, 0.4) !important;
         color: #34c759 !important;
     }}
     
     .stError {{
-        background: rgba(255, 59, 48, 0.1) !important;
-        border-color: rgba(255, 59, 48, 0.3) !important;
+        background: rgba(255, 59, 48, 0.15) !important;
+        border-color: rgba(255, 59, 48, 0.4) !important;
         color: #ff3b30 !important;
+    }}
+    
+    .stWarning {{
+        background: rgba(255, 204, 0, 0.15) !important;
+        border-color: rgba(255, 204, 0, 0.4) !important;
+        color: #ffcc00 !important;
+    }}
+    
+    .stInfo {{
+        background: rgba(0, 122, 255, 0.15) !important;
+        border-color: rgba(0, 122, 255, 0.4) !important;
+        color: #007AFF !important;
     }}
     
     /* تنسيق الـ spinner */
@@ -276,8 +287,37 @@ st.markdown(f"""
         background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
         margin: 30px 0;
     }}
+    
+    /* تنسيق حالة الاتصال */
+    .status-badge {{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 10px;
+    }}
+    
+    .status-online {{
+        background: rgba(52, 199, 89, 0.15);
+        color: #34c759;
+    }}
+    
+    .status-offline {{
+        background: rgba(255, 59, 48, 0.15);
+        color: #ff3b30;
+    }}
+    
+    .status-dot {{
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }}
     </style>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 
 # --- الهيكل البصري ---
 
@@ -291,43 +331,123 @@ else:
 st.markdown('<h1 class="main-title">Doser || Abdelrahman</h1>', unsafe_allow_html=True)
 
 # 3. الحاوية الزجاجية للجملة
-st.markdown("""
+st.markdown('''
     <div class="glass-quote-container">
         <div class="quote-text">الهندسة الذكية لخدمات الرشق المتطورة</div>
     </div>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
 st.markdown('<div class="ios-divider"></div>', unsafe_allow_html=True)
+
+# --- دالة لتوليد IP عشوائي ---
+def generate_random_ip():
+    return ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
+
+# --- دالة إرسال الطلب إلى leofame ---
+def send_request(url, link, quantity=None):
+    random_ip = generate_random_ip()
+    headers = {
+        "User-Agent": generate_user_agent(),
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Origin": "https://leofame.com",
+        "referer": url.split('?')[0],
+        "cookie": "token=FAKETOKEN; cf_clearance=FAKECOOKIE",
+        "X-Forwarded-For": random_ip,
+        "Client-IP": random_ip
+    }
+    data = {
+        "token": "FAKETOKEN",
+        "timezone_offset": "Asia/Baghdad",
+        "free_link": link
+    }
+    if quantity:
+        data["quantity"] = quantity
+    
+    try:
+        # إضافة تأخير عشوائي بين 3 إلى 7 ثوانٍ
+        wait_time = random.randint(3, 7)
+        st.info(f"⏳ جاري الانتظار {wait_time} ثوانٍ لتجنب الحظر...")
+        sleep(wait_time)
+        
+        r = requests.post(url, headers=headers, data=data, timeout=30)
+        
+        # التحقق من الاستجابة
+        if "Please wait" in r.text or '"error":' in r.text:
+            st.error("⚠️ الموقع يطلب الانتظار. جرب لاحقاً أو غير الرابط.")
+            return False
+        elif r.status_code == 200:
+            st.success(f"✅ تم الإرسال بنجاح بـ IP وهمي: {random_ip}")
+            st.balloons()
+            return True
+        else:
+            st.error(f"❌ فشل الاتصال. كود الحالة: {r.status_code}")
+            return False
+            
+    except requests.exceptions.Timeout:
+        st.error("⏱️ انتهى وقت الانتظار. الموقع بطيء أو غير متاح حالياً.")
+        return False
+    except requests.exceptions.ConnectionError:
+        st.error("🔌 خطأ في الاتصال. تأكد من اتصالك بالإنترنت.")
+        return False
+    except Exception as e:
+        st.error(f"❌ حدث خطأ غير متوقع: {str(e)}")
+        return False
 
 # 4. الحقول والزر
 col_input = st.columns([0.05, 0.9, 0.05])[1]
 with col_input:
     st.markdown('<div class="service-tag">اختر الخدمة</div>', unsafe_allow_html=True)
-    service = st.selectbox("", ["✨ إعجابات يوتيوب", "✨ إعجابات تيك توك", "✨ حفظ إنستغرام", "✨ مشاهدات تيك توك"], label_visibility="collapsed")
+    
+    # خيارات الخدمة مع الروابط المقابلة
+    services = {
+        "✨ إعجابات يوتيوب": ("https://leofame.com/free-youtube-likes?api=1", None),
+        "✨ إعجابات تيك توك": ("https://leofame.com/free-tiktok-likes?api=1", None),
+        "✨ حفظ إنستغرام": ("https://leofame.com/free-instagram-saves?api=1", "30"),
+        "✨ مشاهدات تيك توك": ("https://leofame.com/ar/free-tiktok-views?api=1", "200")
+    }
+    
+    service_name = st.selectbox("", list(services.keys()), label_visibility="collapsed")
     
     st.markdown('<div style="height: 15px;"></div>', unsafe_allow_html=True)
     
     st.markdown('<div class="service-tag" style="background: rgba(88, 86, 214, 0.1); color: #5856D6;">الرابط</div>', unsafe_allow_html=True)
-    url_input = st.text_input("", placeholder="https://...", label_visibility="collapsed")
+    video_url = st.text_input("", placeholder="https://...", label_visibility="collapsed")
     
     # 5. زر التنفيذ
-    execute_btn = st.button("تفعيل الخدمة", type="primary")
+    execute_btn = st.button("⚡ تفعيل الخدمة", type="primary")
 
 st.markdown('<div class="ios-divider"></div>', unsafe_allow_html=True)
 
-# --- Logic (الباك إند) ---
-def process_request(url, link):
-    with st.spinner("جاري المعالجة..."):
-        sleep(2)
-        random_ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
-        st.success(f"تم الإرسال بنجاح | IP: {random_ip}")
-        st.balloons()
-
+# --- معالجة الضغط على الزر ---
 if execute_btn:
-    if url_input:
-        process_request(service, url_input)
+    if not video_url:
+        st.error("❌ يرجى إدخال الرابط أولاً!")
     else:
-        st.error("يرجى إدخال الرابط أولاً")
+        with st.spinner('🔄 جاري الاتصال بخوادم leofame...'):
+            # الحصول على URL والكمية للخدمة المختارة
+            service_url, quantity = services[service_name]
+            
+            # إرسال الطلب
+            success = send_request(service_url, video_url, quantity)
+            
+            if success:
+                st.markdown(f'''
+                    <div style="text-align: center; margin-top: 20px;">
+                        <div class="status-badge status-online">
+                            <div class="status-dot"></div>
+                            <span>الخدمة تعمل بنجاح</span>
+                        </div>
+                    </div>
+                ''', unsafe_allow_html=True)
+            else:
+                st.markdown(f'''
+                    <div style="text-align: center; margin-top: 20px;">
+                        <div class="status-badge status-offline">
+                            <div class="status-dot"></div>
+                            <span>الخدمة متوقفة</span>
+                        </div>
+                    </div>
+                ''', unsafe_allow_html=True)
 
 # --- Footer ---
 st.markdown('<p class="footer-text">Doser || Abdelrahman © 2026</p>', unsafe_allow_html=True)
