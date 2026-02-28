@@ -1,349 +1,240 @@
 import streamlit as st
 import requests
 import random
-import base64
 from user_agent import generate_user_agent
 from time import sleep
 
-# --- وظيفة معالجة الصورة البرمجية ---
-def get_base64_image(image_path):
-    try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    except: return None
+# --- إعدادات الصفحة والتصميم الاحترافي ---
+st.set_page_config(
+    page_title="Doser | Social Booster",
+    page_icon="🚀",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-# --- إعدادات الصفحة ---
-st.set_page_config(page_title="Doser || Abdelrahman", page_icon="⚔️", layout="centered", initial_sidebar_state="collapsed")
-
-img_base = get_base64_image("icon.png")
-
-# --- CSS: تصميم iOS 26 Liquid Glass & Neumorphism ---
-st.markdown(f'''
+# CSS احترافي متقدم
+st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
     
-    /* خلفية iOS 26 - Liquid Glass Effect */
-    .stApp {{
-        background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 50%, #f0f0f5 100%);
-        background-attachment: fixed;
-        font-family: 'SF Pro Display', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
-    }}
-
-    /* إخفاء كل عناصر Streamlit الافتراضية */
-    #MainMenu, footer, header, .stDeployButton, .stAppToolbar, .stActionButton,
-    .st-emotion-cache-1dp5vir, .st-emotion-cache-15ecox0, .st-emotion-cache-1wbqy5l,
-    .st-emotion-cache-1avcm0n, .st-emotion-cache-18ni7ap, .st-emotion-cache-1y4p8pa,
-    .st-emotion-cache-1cypcdb, .st-emotion-cache-1wrcr25, .st-emotion-cache-16txtl3,
-    .st-emotion-cache-1jicfl2, .st-emotion-cache-10trblm, .st-emotion-cache-16idsys {{
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        width: 0 !important;
-        position: absolute !important;
-        top: -9999px !important;
-        pointer-events: none !important;
-    }}
+    * { font-family: 'Tajawal', sans-serif; }
     
-    /* إخفاء الشريط العلوي والأزرار */
-    .stApp header, .stToolbar, .stAppToolbar {{
-        display: none !important;
-    }}
+    .stApp { 
+        background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        color: white;
+    }
     
-    /* إزالة المساحات الفارغة */
-    .main > div {{
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }}
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(2deg); }
+    }
     
-    .block-container {{
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-        max-width: 600px !important;
-    }}
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3); }
+        50% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.8), 0 0 60px rgba(0, 212, 255, 0.5); }
+    }
     
-    /* تنسيق الصورة الشخصية - iOS 26 Style */
-    .profile-container {{
-        display: flex;
-        justify-content: center;
-        margin: 30px 0 25px 0;
-    }}
+    @keyframes pulse-ring {
+        0% { transform: scale(0.8); opacity: 0.5; }
+        100% { transform: scale(1.3); opacity: 0; }
+    }
     
-    .hero-img {{
+    .logo-container {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 30px auto;
+    }
+    
+    .logo-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        border: 3px solid #00d4ff;
+        border-radius: 50%;
+        animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    
+    .logo-img {
+        position: relative;
         width: 180px;
         height: 180px;
         border-radius: 50%;
+        border: 4px solid #00d4ff;
         object-fit: cover;
-        box-shadow: 
-            0 20px 40px rgba(0, 0, 0, 0.15),
-            0 0 0 8px rgba(255, 255, 255, 0.8),
-            0 0 0 12px rgba(0, 122, 255, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }}
+        animation: float 6s ease-in-out infinite, glow 3s ease-in-out infinite;
+        box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+        z-index: 10;
+    }
     
-    .hero-img:hover {{
-        transform: scale(1.02);
-        box-shadow: 
-            0 25px 50px rgba(0, 0, 0, 0.2),
-            0 0 0 8px rgba(255, 255, 255, 0.9),
-            0 0 0 12px rgba(0, 122, 255, 0.2);
-    }}
-
-    /* العنوان الرئيسي - iOS 26 Blue */
-    .main-title {{
-        font-size: 2.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+    .title-text {
+        text-align: center;
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #00d4ff, #7b2cbf, #00d4ff);
+        background-size: 200% 200%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        animation: gradient-shift 3s ease infinite;
         margin-bottom: 10px;
-        letter-spacing: -0.5px;
+        text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        letter-spacing: 2px;
+    }
+    
+    @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .subtitle {
         text-align: center;
-    }}
-    
-    /* الحاوية الزجاجية - Liquid Glass Effect */
-    .glass-quote-container {{
-        background: rgba(255, 255, 255, 0.72);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        border-radius: 24px;
-        padding: 20px 25px;
-        text-align: center;
-        box-shadow: 
-            0 8px 32px rgba(0, 0, 0, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        margin: 25px auto 35px auto;
-        width: 90%;
-        max-width: 500px;
-    }}
-    
-    /* تنسيق الجملة - Dark Gray iOS */
-    .quote-text {{
-        color: #1c1c1e;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 0;
-        line-height: 1.4;
-        letter-spacing: -0.2px;
-    }}
-
-    /* تحسين شكل المدخلات - iOS Style */
-    .stTextInput input, .stSelectbox [data-baseweb="select"] {{
-        background: rgba(255, 255, 255, 0.8) !important;
-        border-radius: 16px !important;
-        border: 1px solid rgba(0, 0, 0, 0.08) !important;
-        color: #1c1c1e !important;
-        height: 52px !important;
-        direction: rtl !important;
-        text-align: right !important;
-        font-size: 1rem !important;
-        font-weight: 400 !important;
-        padding: 0 18px !important;
-        box-shadow: 
-            inset 0 1px 2px rgba(0, 0, 0, 0.05),
-            0 2px 4px rgba(0, 0, 0, 0.02) !important;
-        transition: all 0.2s ease !important;
-    }}
-    
-    .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus {{
-        border-color: #007AFF !important;
-        box-shadow: 
-            0 0 0 4px rgba(0, 122, 255, 0.15),
-            inset 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-    }}
-    
-    .stTextInput input::placeholder {{
-        color: #8e8e93 !important;
-    }}
-    
-    /* تنسيق الـ select box */
-    .stSelectbox [data-baseweb="select"] > div {{
-        background: transparent !important;
-        color: #1c1c1e !important;
-    }}
-    
-    /* تنسيق القائمة المنسدلة */
-    .stSelectbox [data-baseweb="popover"] {{
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(20px) !important;
-        border: 1px solid rgba(0, 0, 0, 0.08) !important;
-        border-radius: 16px !important;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
-    }}
-    
-    .stSelectbox [data-baseweb="popover"] li {{
-        color: #1c1c1e !important;
-        background: transparent !important;
-        font-size: 0.95rem !important;
-        padding: 12px 16px !important;
-        border-radius: 8px !important;
-        margin: 4px 8px !important;
-    }}
-    
-    .stSelectbox [data-baseweb="popover"] li:hover {{
-        background: rgba(0, 122, 255, 0.1) !important;
-        color: #007AFF !important;
-    }}
-
-    /* زر التشغيل - iOS 26 Style */
-    .stButton>button {{
-        background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%) !important;
-        color: white !important;
-        border-radius: 16px !important;
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
-        height: 56px !important;
-        width: 100% !important;
-        border: none !important;
-        margin-top: 20px !important;
-        box-shadow: 
-            0 4px 15px rgba(0, 122, 255, 0.3),
-            0 1px 2px rgba(0, 0, 0, 0.1) !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        letter-spacing: -0.3px !important;
-    }}
-    
-    .stButton>button:hover {{
-        transform: translateY(-2px);
-        box-shadow: 
-            0 8px 25px rgba(0, 122, 255, 0.4),
-            0 2px 4px rgba(0, 0, 0, 0.1) !important;
-        background: linear-gradient(135deg, #007AFF 0%, #6b69e0 100%) !important;
-    }}
-    
-    .stButton>button:active {{
-        transform: translateY(0px) scale(0.98);
-    }}
-    
-    /* تنسيق رسائل النجاح والخطأ - iOS Style */
-    .stAlert {{
-        background: rgba(255, 255, 255, 0.9) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(0, 0, 0, 0.08) !important;
-        border-radius: 16px !important;
-        color: #1c1c1e !important;
-        font-weight: 500 !important;
-        text-align: center !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-    }}
-    
-    .stSuccess {{
-        background: rgba(52, 199, 89, 0.15) !important;
-        border-color: rgba(52, 199, 89, 0.4) !important;
-        color: #34c759 !important;
-    }}
-    
-    .stError {{
-        background: rgba(255, 59, 48, 0.15) !important;
-        border-color: rgba(255, 59, 48, 0.4) !important;
-        color: #ff3b30 !important;
-    }}
-    
-    .stWarning {{
-        background: rgba(255, 204, 0, 0.15) !important;
-        border-color: rgba(255, 204, 0, 0.4) !important;
-        color: #ffcc00 !important;
-    }}
-    
-    .stInfo {{
-        background: rgba(0, 122, 255, 0.15) !important;
-        border-color: rgba(0, 122, 255, 0.4) !important;
-        color: #007AFF !important;
-    }}
-    
-    /* تنسيق الـ spinner */
-    .stSpinner > div {{
-        border-color: #007AFF transparent transparent transparent !important;
-    }}
-    
-    /* تنسيق الفوتر - iOS Gray */
-    .footer-text {{
-        text-align: center;
-        color: #8e8e93;
-        font-size: 0.9rem;
-        margin-top: 40px;
+        color: #a0a0a0;
+        font-size: 1.2rem;
+        margin-bottom: 40px;
         font-weight: 400;
-        letter-spacing: 0.5px;
-    }}
+        letter-spacing: 1px;
+    }
     
-    /* تنسيق العلامات */
-    .service-tag {{
-        display: inline-block;
-        background: rgba(0, 122, 255, 0.1);
-        color: #007AFF;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }}
+    .stSelectbox > div > div {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(0, 212, 255, 0.3) !important;
+        border-radius: 15px !important;
+        color: white !important;
+        backdrop-filter: blur(10px);
+    }
     
-    /* Divider iOS Style */
-    .ios-divider {{
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
-        margin: 30px 0;
-    }}
+    .stSelectbox > div > div:hover {
+        border-color: #00d4ff !important;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
     
-    /* تنسيق حالة الاتصال */
-    .status-badge {{
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border-radius: 20px;
+    .stTextInput > div > div > input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(0, 212, 255, 0.3) !important;
+        border-radius: 15px !important;
+        color: white !important;
+        padding: 15px !important;
+        font-size: 16px !important;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #00d4ff !important;
+        box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .stButton > button {
+        width: 100%;
+        padding: 18px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+        color: white;
+        font-weight: 900;
+        font-size: 1.3rem;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-top: 20px;
+        box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    }
+    
+    .stButton > button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: 0.5s;
+    }
+    
+    .stButton > button:hover::before {
+        left: 100%;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(-1px);
+    }
+    
+    .footer {
+        text-align: center;
+        padding: 30px;
+        margin-top: 50px;
+        border-top: 1px solid rgba(0, 212, 255, 0.2);
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .footer-text {
+        color: #00d4ff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 5px;
+    }
+    
+    .footer-sub {
+        color: #666;
         font-size: 0.9rem;
-        font-weight: 600;
-        margin-top: 10px;
-    }}
+    }
     
-    .status-online {{
-        background: rgba(52, 199, 89, 0.15);
-        color: #34c759;
-    }}
+    .divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+        margin: 40px 0;
+        border: none;
+    }
     
-    .status-offline {{
-        background: rgba(255, 59, 48, 0.15);
-        color: #ff3b30;
-    }}
-    
-    .status-dot {{
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: currentColor;
-    }}
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0f0c29;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #00d4ff;
+        border-radius: 5px;
+    }
     </style>
-    ''', unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# --- الهيكل البصري ---
-
-# 1. الصورة في المنتصف
-if img_base:
-    st.markdown(f'<div class="profile-container"><img src="data:image/png;base64,{img_base}" class="hero-img"></div>', unsafe_allow_html=True)
-else:
-    st.markdown('<div class="profile-container"><div class="hero-img" style="background:linear-gradient(135deg, #007AFF, #5856D6);"></div></div>', unsafe_allow_html=True)
-
-# 2. العنوان الرئيسي
-st.markdown('<h1 class="main-title">Doser || Abdelrahman</h1>', unsafe_allow_html=True)
-
-# 3. الحاوية الزجاجية للجملة
-st.markdown('''
-    <div class="glass-quote-container">
-        <div class="quote-text">الهندسة الذكية لخدمات الرشق المتطورة</div>
+# --- الشعار والهيدر الاحترافي ---
+st.markdown("""
+    <div class="logo-container">
+        <div class="logo-ring"></div>
+        <img src="icon.png" class="logo-img" alt="Doser Logo">
     </div>
-''', unsafe_allow_html=True)
+    <h1 class="title-text">DOSER</h1>
+    <p class="subtitle">منصة تعزيز الخدمات الاجتماعية الذكية</p>
+""", unsafe_allow_html=True)
 
-st.markdown('<div class="ios-divider"></div>', unsafe_allow_html=True)
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
-# --- دالة لتوليد IP عشوائي ---
+# --- دالة توليد IP عشوائي ---
 def generate_random_ip():
     return ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
 
-# --- دالة إرسال الطلب إلى leofame ---
+# --- دالات الإرسال ---
 def send_request(url, link, quantity=None):
     random_ip = generate_random_ip()
     headers = {
@@ -364,90 +255,64 @@ def send_request(url, link, quantity=None):
         data["quantity"] = quantity
     
     try:
-        # إضافة تأخير عشوائي بين 3 إلى 7 ثوانٍ
         wait_time = random.randint(3, 7)
-        st.info(f"⏳ جاري الانتظار {wait_time} ثوانٍ لتجنب الحظر...")
-        sleep(wait_time)
+        st.info(f"⏳ جاري المعالجة... انتظر {wait_time} ثوانٍ")
         
-        r = requests.post(url, headers=headers, data=data, timeout=30)
+        with st.spinner(''):
+            progress_bar = st.progress(0)
+            for i in range(100):
+                sleep(wait_time/100)
+                progress_bar.progress(i + 1)
         
-        # التحقق من الاستجابة
+        r = requests.post(url, headers=headers, data=data)
+        
         if "Please wait" in r.text or '"error":' in r.text:
-            st.error("⚠️ الموقع يطلب الانتظار. جرب لاحقاً أو غير الرابط.")
-            return False
-        elif r.status_code == 200:
-            st.success(f"✅ تم الإرسال بنجاح بـ IP وهمي: {random_ip}")
-            st.balloons()
-            return True
+            st.error("⚠️ يوجد تأخير من الخادم، يرجى المحاولة لاحقاً")
         else:
-            st.error(f"❌ فشل الاتصال. كود الحالة: {r.status_code}")
-            return False
+            st.balloons()
+            st.success(f"✅ تم التنفيذ بنجاح! (IP: {random_ip})")
             
-    except requests.exceptions.Timeout:
-        st.error("⏱️ انتهى وقت الانتظار. الموقع بطيء أو غير متاح حالياً.")
-        return False
-    except requests.exceptions.ConnectionError:
-        st.error("🔌 خطأ في الاتصال. تأكد من اتصالك بالإنترنت.")
-        return False
     except Exception as e:
-        st.error(f"❌ حدث خطأ غير متوقع: {str(e)}")
-        return False
+        st.error(f"❌ خطأ في الاتصال: {str(e)}")
 
-# 4. الحقول والزر
-col_input = st.columns([0.05, 0.9, 0.05])[1]
-with col_input:
-    st.markdown('<div class="service-tag">اختر الخدمة</div>', unsafe_allow_html=True)
-    
-    # خيارات الخدمة مع الروابط المقابلة
-    services = {
-        "✨ إعجابات يوتيوب": ("https://leofame.com/free-youtube-likes?api=1", None),
-        "✨ إعجابات تيك توك": ("https://leofame.com/free-tiktok-likes?api=1", None),
-        "✨ حفظ إنستغرام": ("https://leofame.com/free-instagram-saves?api=1", "30"),
-        "✨ مشاهدات تيك توك": ("https://leofame.com/ar/free-tiktok-views?api=1", "200")
-    }
-    
-    service_name = st.selectbox("", list(services.keys()), label_visibility="collapsed")
-    
-    st.markdown('<div style="height: 15px;"></div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="service-tag" style="background: rgba(88, 86, 214, 0.1); color: #5856D6;">الرابط</div>', unsafe_allow_html=True)
-    video_url = st.text_input("", placeholder="https://...", label_visibility="collapsed")
-    
-    # 5. زر التنفيذ
-    execute_btn = st.button("⚡ تفعيل الخدمة", type="primary")
+# --- واجهة الاختيار ---
+col1, col2 = st.columns([1, 1])
 
-st.markdown('<div class="ios-divider"></div>', unsafe_allow_html=True)
+with col1:
+    option = st.selectbox(
+        "اختر الخدمة",
+        ["إعجابات يوتيوب", "إعجابات تيك توك", "حفظ إنستغرام", "مشاهدات تيك توك"],
+        index=0
+    )
 
-# --- معالجة الضغط على الزر ---
-if execute_btn:
-    if not video_url:
-        st.error("❌ يرجى إدخال الرابط أولاً!")
+with col2:
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+video_url = st.text_input(
+    "🔗 رابط المنشور",
+    placeholder="https://www.example.com/...",
+    help="ألصق الرابط هنا"
+)
+
+# --- زر التنفيذ ---
+if st.button("🚀 تنفيذ الطلب"):
+    if video_url:
+        endpoints = {
+            "إعجابات يوتيوب": ("https://leofame.com/free-youtube-likes?api=1", None),
+            "إعجابات تيك توك": ("https://leofame.com/free-tiktok-likes?api=1", None),
+            "حفظ إنستغرام": ("https://leofame.com/free-instagram-saves?api=1", "30"),
+            "مشاهدات تيك توك": ("https://leofame.com/ar/free-tiktok-views?api=1", "200")
+        }
+        
+        url, qty = endpoints[option]
+        send_request(url, video_url, qty)
     else:
-        with st.spinner('🔄 جاري الاتصال بخوادم leofame...'):
-            # الحصول على URL والكمية للخدمة المختارة
-            service_url, quantity = services[service_name]
-            
-            # إرسال الطلب
-            success = send_request(service_url, video_url, quantity)
-            
-            if success:
-                st.markdown(f'''
-                    <div style="text-align: center; margin-top: 20px;">
-                        <div class="status-badge status-online">
-                            <div class="status-dot"></div>
-                            <span>الخدمة تعمل بنجاح</span>
-                        </div>
-                    </div>
-                ''', unsafe_allow_html=True)
-            else:
-                st.markdown(f'''
-                    <div style="text-align: center; margin-top: 20px;">
-                        <div class="status-badge status-offline">
-                            <div class="status-dot"></div>
-                            <span>الخدمة متوقفة</span>
-                        </div>
-                    </div>
-                ''', unsafe_allow_html=True)
+        st.warning("⚠️ يرجى إدخال الرابط أولاً")
 
-# --- Footer ---
-st.markdown('<p class="footer-text">Doser || Abdelrahman © 2026</p>', unsafe_allow_html=True)
+# --- الفوتر الاحترافي ---
+st.markdown("""
+    <div class="footer">
+        <div class="footer-text">DOSER | Abdelrahman</div>
+        <div class="footer-sub">تم التطوير بواسطة Doser © 2026</div>
+    </div>
+""", unsafe_allow_html=True)
